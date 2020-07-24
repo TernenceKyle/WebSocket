@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BitCoinNow</title>
+</head>
+<body style="font-family: 'JetBrains Mono Medium'">
+    <div style="width: 680px;height: 240px;border: gainsboro solid 2px;background-color: floralwhite;left: 30%;top: 10%;position: fixed">
+        <div style="margin-left:50px;margin-top: 50px;width: 480px;height: 60px;background-color: blanchedalmond">
+            <label style="color: darkorange;margin-top: 20px;margin-left: 20px">BitCoinInfo : 当前价格: <label id="price" style="color: indianred"></label>
+                当前在线客户人数: <label style="color: darkslateblue" id="total"></label>
+            </label>
+            <label style="color: chocolate" id="info"></label>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    var webSocket = null;
+    if ('WebSocket' in window)
+    {
+        webSocket = new WebSocket("ws://localhost:1234/BitCoin");
+        webSocket.onopen = function () {
+            webSocket.send("客户端连接成功");
+        }
+        webSocket.onmessage= function (event) {
+            setInnerHTML(event.data);
+        }
+        webSocket.onerror = function () {
+            alert("WebSocket链接发生错误");
+        }
+        webSocket.onclose=function () {
+            console.log("WebSocket连接关闭");
+        }
+        window.onbeforeunload = function () {
+            closeWebSocket();
+        }
+    }else{
+        alert("当前浏览器不支持WebSocket");
+    }
+    function setInnerHTML(innerHTML) {
+        var parse = JSON.parse(innerHTML);
+        document.getElementById('price').innerHTML = parse.price;
+        document.getElementById("total").innerHTML = parse.total;
+    }
+    function closeWebSocket() {
+        webSocket.close();
+    }
+</script>
+</html>
